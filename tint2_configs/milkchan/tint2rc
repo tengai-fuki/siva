@@ -1,0 +1,123 @@
+#----------------------------------------------------
+# FukiOS - Milk inside a bag of milk Tint2 Dock
+# Path: /usr/local/configs/tint2-dock.conf
+#----------------------------------------------------
+
+# Background 1: Panel Zemini (Mutlak Siyah + Kan Kırmızı Çerçeve)
+rounded = 8
+border_width = 1
+border_sides = T L R B
+border_color = #8b0000 100
+background_color = #000000 65
+
+# Background 2: Pasif Görevler (Koyu Kasvetli Siyah)
+rounded = 5
+border_width = 1
+border_sides = T L R B
+border_color = #220000 100
+background_color = #080808 65
+
+# Background 3: Aktif Pencere (Parlak Kırmızı Vurgu)
+rounded = 6
+border_width = 1
+border_sides = T L R B
+border_color = #ff0033 100
+background_color = #2a0005 65
+
+# Background 4: Uyarı / Urgent (Psikotik Kırmızı Flas)
+rounded = 0
+border_width = 1
+border_sides = T L R B
+border_color = #ff0000 100
+background_color = #8b0000 100
+
+# PANEL DÜZENİ
+panel_items = TSEEEEC
+panel_size = 100% 30
+panel_margin = 0 3
+panel_padding = 4 2 4
+panel_background_id = 1
+wm_menu = 1
+panel_dock = 0
+panel_position = top center horizontal
+panel_layer = bottom
+strut_policy = follow_size
+
+# TASKBAR (GÖREV ÇUBUĞU)
+taskbar_mode = single_desktop
+taskbar_padding = 2 0 2
+taskbar_background_id = 0
+taskbar_active_background_id = 0
+taskbar_sort_order = none
+
+# PENCERE ETİKETLERİ
+task_icon = 1
+task_text = 1
+task_centered = 0
+task_maximum_size = 180 26
+task_padding = 6 2 6
+task_font = Monospace bold 9
+task_font_color = #882222 100
+task_active_font_color = #ff3344 100
+task_urgent_font_color = #ffffff 100
+task_background_id = 2
+task_active_background_id = 3
+task_urgent_background_id = 4
+
+# SİSTEM TEPSİSİ (SYSTRAY)
+systray_padding = 4 0 4
+systray_background_id = 0
+systray_icon_size = 16
+
+# SAAT
+time1_format = %H:%M:%S
+time1_font = Monospace bold 9
+clock_font_color = #ff0033 100
+clock_padding = 6 0 6
+clock_background_id = 0
+
+# CPU KULLANIMI
+execp = new
+execp_command = if [ "$(uname -s)" = "FreeBSD" ]; then idle=$(vmstat 1 2 | tail -n 1 | awk '{print $NF}'); echo "cpu $((100 - idle))%"; else idle=$(top -bn2 | grep '%Cpu' | tail -1 | awk '{print $8}' | cut -d'.' -f1); echo "cpu $((100 - idle))%"; fi
+execp_interval = 2
+execp_font = Monospace bold 9
+execp_font_color = #ff3344 100
+execp_padding = 6 0 6
+execp_background_id = 0
+
+# RAM KULLANIMI
+execp = new
+execp_command = if [ "$(uname -s)" = "FreeBSD" ]; then total=$(sysctl -n hw.physmem); page=$(sysctl -n hw.pagesize); free=$(( ($(sysctl -n vm.stats.vm.v_free_count) + $(sysctl -n vm.stats.vm.v_inactive_count)) * page )); echo "ram $(( (total - free) * 100 / total ))%"; else echo "ram $(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')%"; fi
+execp_interval = 5
+execp_font = Monospace bold 9
+execp_font_color = #ff3344 100
+execp_padding = 6 0 6
+execp_background_id = 0
+
+#volume
+execp = new
+execp_command = /bin/sh -c "/usr/sbin/mixer vol.mute 2>/dev/null | grep -qE '1|on' && echo şizuka || /usr/sbin/mixer vol | cut -d'=' -f2 | cut -d':' -f1 | sed -e 's/1\.00/100/' -e 's/0\.//' -e 's/^0//' -e 's/^/hib /' -e 's/$/%/'"
+execp_interval = 1
+execp_font = Monospace bold 9
+execp_font_color = #ff3344 100
+execp_padding = 6 0 6
+execp_background_id = 0
+execp_lclick_command = /usr/sbin/mixer vol.mute=toggle
+execp_uwheel_command = /usr/sbin/mixer vol=+0.05
+execp_dwheel_command = /usr/sbin/mixer vol=-0.05
+
+
+#BATTERY
+execp = new
+execp_command = if [ "$(uname -s)" = "FreeBSD" ]; then ac=$(sysctl -n hw.acpi.acline 2>/dev/null); bat=$(sysctl -n hw.acpi.battery.life 2>/dev/null); else ac=$(cat /sys/class/power_supply/*/online 2>/dev/null | head -n1); bat=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); fi; bat=${bat:-0}; if [ "$ac" = "1" ]; then echo "<span foreground='#00ff66'> ${bat}%</span>"; elif [ "$bat" -le 20 ]; then echo "<span foreground='#cc00ff'> ${bat}%</span>"; elif [ "$bat" -le 49 ]; then echo "<span foreground='#ffcc00'> ${bat}%</span>"; else echo "<span foreground='#ff0033'> ${bat}%</span>"; fi
+execp_markup = 1
+execp_interval = 5
+execp_font = Monospace bold 9
+execp_padding = 6 0 6
+execp_background_id = 0
+
+# OTOMATIK SIRA KORUYUCU HOOK
+execp = new
+execp_command = /bin/sh ~/.config/tint2/panel.sh
+execp_interval = 0
+execp_background_id = 0
